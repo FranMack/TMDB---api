@@ -1,6 +1,6 @@
-const Users=require("./users.model");
-const Favoritos=require("./favoritos.model")
+const Users = require("./users.model");
+const Favoritos = require("./favoritos.model");
 
-Favoritos.belongsTo(Users,{ as: "user" })
+Favoritos.belongsTo(Users, { as: "user" });
 
-module.exports={Users,Favoritos}
+module.exports = { Users, Favoritos };

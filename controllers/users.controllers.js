@@ -1,15 +1,15 @@
 const Users = require("../models/users.model");
 const UserServices = require("../services/user.services");
 const { body, validationResult, cookie } = require("express-validator");
-const {generateToken}=require("../config/token")
+const { generateToken } = require("../config/token");
 
 class UserControllers {
   static async register(req, res) {
     const data = req.body;
-    const { name, lastname, email, username, password }=data;
+    const { name, lastname, email, username, password } = data;
 
     try {
-        await body("name")
+      await body("name")
         .notEmpty()
         .withMessage("firstname is required")
         .isLength({ min: 1 })
@@ -56,15 +56,11 @@ class UserControllers {
         .withMessage("password must contain at least one capital letter")
         .run(req);
 
-
-        const errors = validationResult(req);
+      const errors = validationResult(req);
       if (!errors.isEmpty()) {
         console.log("errores", errors);
         return res.status(400).json({ errors: errors.array() });
       }
-
-
-
 
       const existinUser = await Users.findOne({ where: { email: email } });
 
@@ -79,118 +75,82 @@ class UserControllers {
     }
   }
 
+  static async login(req, res) {
+    const { email, password } = req.body;
 
-  static async login(req,res){
+    try {
+      const user = await Users.findOne({ where: { email: email } });
+      if (!user) {
+        return res.status(400).json({ errors: "Wrong credentials" });
+      }
 
-    const {email,password}=req.body
+      const validated = await user.validatePassword(password);
 
-    try{
-        const user= await Users.findOne({where:{email:email}})
-        if(!user){
+      if (!validated) {
+        return res.status(400).json({ errors: "Wrong credentials" });
+      }
 
-            return res.status(400).json({ errors: "Wrong credentials" })
+      const payload = {
+        name: user.name,
+        lastname: user.lastname,
+        email: user.email,
+        username: user.username,
+        id: user.id,
+      };
 
-        }
+      //falta el token etc
+      const token = generateToken(payload);
+      console.log("token", token);
 
-        const validated= await user.validatePassword(password)
-
-        if(!validated){
-
-            return res.status(400).json({ errors: "Wrong credentials" })
-
-        }
-
-        const payload = {
-            name: user.name,
-            lastname:user.lastname,
-            email: user.email,
-            username: user.username,
-            id: user.id,
-          };
-
-          //falta el token etc
-          const token= generateToken(payload);
-          console.log("token",token)
-
-          res.cookie("token",token)
-          res.status(200).json({payload})
-
-    }
-
-    catch(error){
-
-      console.log(error)
-
+      res.cookie("token", token);
+      res.status(200).json({ payload });
+    } catch (error) {
+      console.log(error);
     }
   }
 
-
-  static async getInfo(req,res){
-
-    const email=req.params.email;
-    try{
-      const user=await UserServices.getInfo(email)
-      res.status(200).json(user)
-
-    }
-
-    catch(error){
-      console.log(error)
-
+  static async getInfo(req, res) {
+    const email = req.params.email;
+    try {
+      const user = await UserServices.getInfo(email);
+      res.status(200).json(user);
+    } catch (error) {
+      console.log(error);
     }
   }
 
-  static async logout(req,res){
-    try{
-      const {token}=req.body;
-    res.clearCookie(token)
-    res.sendStatus(204)
-
+  static async logout(req, res) {
+    try {
+      const { token } = req.body;
+      res.clearCookie(token);
+      res.sendStatus(204);
+    } catch (error) {
+      console.log(error);
     }
-    catch(error){
-      console.log(error)
-    }
-    
-
   }
 
-  static async addToFavorites(req,res){
+  static async addToFavorites(req, res) {
+    const { movieId, userId } = req.body;
 
-    const {movieId,userId}=req.body
-
-    try{
-      
-
-      const newFavorite=await UserServices.addToFavorites(movieId,userId)
-      res.status(200).json(newFavorite)
-
-    }
-
-    catch (error) {
-      console.log(error)
+    try {
+      const newFavorite = await UserServices.addToFavorites(movieId, userId);
+      res.status(200).json(newFavorite);
+    } catch (error) {
+      console.log(error);
       res.status(400).json({ error: error.message });
     }
   }
 
+  static async getFavorites(req, res) {
+    const { userId } = req.query;
 
-  static async getFavorites(req,res){
-    const {userId}=req.query
-
-
-    try{
-      const favorites=await UserServices.getFavorites(userId)
-      res.status(200).json(favorites)
-
-    }
-    catch(error){
-      console.log(error)
-
+    try {
+      const favorites = await UserServices.getFavorites(userId);
+      res.status(200).json(favorites);
+    } catch (error) {
+      console.log(error);
     }
   }
-
- 
-
- 
 }
 
-module.exports=UserControllers;
+module.exports = UserControllers;

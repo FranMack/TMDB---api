@@ -25,13 +25,13 @@ class MoviesControllers {
   }
 
   static async getInfoMovie(req, res) {
-    const { id,type } = req.params;
+    const { id, type } = req.params;
 
-    console.log("xxxxxxxxxx",id)
-    console.log("xxxxxxxxxx",type)
+    console.log("xxxxxxxxxx", id);
+    console.log("xxxxxxxxxx", type);
 
     try {
-      const response = await MoviesServices.getInfoMovie(id,type);
+      const response = await MoviesServices.getInfoMovie(id, type);
       res.status(200).json(response.data);
     } catch (error) {
       console.log(error);

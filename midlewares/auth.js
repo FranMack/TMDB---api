@@ -1,26 +1,21 @@
-const {validateToken}=require("../config/token")
+const { validateToken } = require("../config/token");
 
-function validateAuth(req,res,next){
+function validateAuth(req, res, next) {
+  const token = req.cookies.token;
 
-    const token=req.cookies.token;
+  if (!token) {
+    return res.sendStatus(401);
+  }
 
-    console.log("token===========>",token)
+  const user = validateToken(token);
 
-    if(!token){
-        return res.sendStatus(401)
-    }
-    
-    const user=validateToken(token);
+  if (!user) {
+    return res.sendStatus(401);
+  }
 
-    if(!user){
-       return res.sendStatus(401)
-    }
+  req.user = user;
 
-    req.user=user;
-
-    next();
-
-
+  next();
 }
 
-module.exports=validateAuth;
+module.exports = validateAuth;

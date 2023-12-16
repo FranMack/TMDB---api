@@ -1,8 +1,7 @@
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
-const SECRET=process.env.SECRET || "branqui";
-
+const SECRET = process.env.SECRET || "branqui";
 
 const generateToken = (payload) => {
   const token = jwt.sign(payload, SECRET, { expiresIn: "24h" });
