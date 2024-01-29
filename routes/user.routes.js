@@ -8,6 +8,7 @@ userRouter.post("/login", UserControllers.login);
 userRouter.get("/info/:email", validateAuth, UserControllers.getInfo);
 userRouter.post("/logout", validateAuth, UserControllers.logout);
 userRouter.post("/addFavorite", validateAuth, UserControllers.addToFavorites);
+userRouter.delete("/deleteFavorite", UserControllers.deleteFavorite);
 userRouter.get("/favorites", validateAuth, UserControllers.getFavorites);
 userRouter.get("/me", validateAuth, (req, res) => {
   res.send(req.user);

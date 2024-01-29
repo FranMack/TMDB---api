@@ -67,6 +67,29 @@ class UserServices {
       console.log(error);
     }
   }
+
+  static async deleteFavorite(movieId,userId){
+    try{
+      const deletedFavorite=await Favoritos.findOne({where:{movieId:movieId,userId:userId}});
+      if(!deletedFavorite){
+        throw new Error ("Pelicula no encontrada en favoritos")
+      }
+
+      Favoritos.destroy({where:{movieId:movieId}})
+
+      return
+
+    }
+
+    catch (error) {
+      
+      if (error.response && error.response.data) {
+        throw new Error(error.response.data);
+      } else {
+        throw error;
+      }
+    }
+  }
 }
 
 module.exports = UserServices;

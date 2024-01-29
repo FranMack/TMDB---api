@@ -2,6 +2,7 @@ const Users = require("../models/users.model");
 const UserServices = require("../services/user.services");
 const { body, validationResult, cookie } = require("express-validator");
 const { generateToken } = require("../config/token");
+const { Favoritos } = require("../models");
 
 class UserControllers {
   static async register(req, res) {
@@ -149,6 +150,21 @@ class UserControllers {
       res.status(200).json(favorites);
     } catch (error) {
       console.log(error);
+    }
+  }
+
+  static async deleteFavorite(req, res) {
+    const { movieId, userId } = req.query;
+    try {
+      const deletedFavorite = await UserServices.deleteFavorite(
+        movieId,
+        userId
+      );
+
+      res.status(200).json("Deleted");
+    } catch (error) {
+      console.log(error);
+      res.status(400).json({ error: error.message });
     }
   }
 }
