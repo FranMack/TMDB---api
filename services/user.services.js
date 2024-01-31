@@ -68,26 +68,45 @@ class UserServices {
     }
   }
 
-  static async deleteFavorite(movieId,userId){
-    try{
-      const deletedFavorite=await Favoritos.findOne({where:{movieId:movieId,userId:userId}});
-      if(!deletedFavorite){
-        throw new Error ("Pelicula no encontrada en favoritos")
+  static async deleteFavorite(movieId, userId) {
+    try {
+      const deletedFavorite = await Favoritos.findOne({
+        where: { movieId: movieId, userId: userId },
+      });
+      if (!deletedFavorite) {
+        throw new Error("Pelicula no encontrada en favoritos");
       }
 
-      Favoritos.destroy({where:{movieId:movieId}})
+      Favoritos.destroy({ where: { movieId: movieId } });
 
-      return
-
-    }
-
-    catch (error) {
-      
+      return;
+    } catch (error) {
       if (error.response && error.response.data) {
         throw new Error(error.response.data);
       } else {
         throw error;
       }
+    }
+  }
+
+  static async editProfile(data) {
+    try {
+      const user = await Users.findOne({ where: { email: data.email } });
+
+      user.name = data.name;
+      user.lastname = data.lastname;
+      user.username = data.username;
+      user.url_img = data.url_img;
+
+      if (data.password) {await user.actualizar(data.password)}
+
+      
+
+      const userModified = await user.save();
+
+      return userModified;
+    } catch (error) {
+      console.log(error);
     }
   }
 }

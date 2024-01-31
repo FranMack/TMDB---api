@@ -54,4 +54,14 @@ Users.prototype.validatePassword = function (password) {
     .then((hash) => hash === this.password);
 };
 
+Users.prototype.actualizar = function (newPassword) {
+  const salt = bcrypt.genSaltSync(8);
+  this.salt = salt;
+  return bcrypt.hash(newPassword, this.salt).then((hash) => {
+    this.password = hash;
+  });
+};
+
+
+
 module.exports = Users;
