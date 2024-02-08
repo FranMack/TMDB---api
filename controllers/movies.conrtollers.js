@@ -27,9 +27,6 @@ class MoviesControllers {
   static async getInfoMovie(req, res) {
     const { id, type } = req.params;
 
-    console.log("xxxxxxxxxx", id);
-    console.log("xxxxxxxxxx", type);
-
     try {
       const response = await MoviesServices.getInfoMovie(id, type);
       res.status(200).json(response.data);
@@ -40,7 +37,6 @@ class MoviesControllers {
 
   static async getFavoriesMoviesInfo(req, res) {
     const { moviesId } = req.body;
-    console.log("moviesID CONTROLLER", moviesId);
 
     try {
       const moviesInfo = await MoviesServices.getFavoriesMoviesInfo(moviesId);
@@ -65,11 +61,8 @@ class MoviesControllers {
   static async searchMovies(req, res) {
     const { query } = req.query;
 
-    console.log("query==========>", query);
-
     try {
       const movies = await MoviesServices.searchMovies(query);
-      console.log("controllers==========>", movies);
 
       res.status(200).json(movies);
     } catch (error) {

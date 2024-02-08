@@ -62,6 +62,4 @@ Users.prototype.actualizar = function (newPassword) {
   });
 };
 
-
-
 module.exports = Users;

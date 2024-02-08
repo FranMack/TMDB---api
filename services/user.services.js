@@ -36,12 +36,12 @@ class UserServices {
     try {
       const user = await Users.findByPk(userId);
       if (!user) {
-        throw new Error("El usuario no existe");
+        throw new Error("Username does not exist");
       }
       const favorite = await Favoritos.findOne({ where: { movieId, userId } });
       console.log("favoriteeee", favorite);
       if (favorite) {
-        throw new Error("La pelicula ya se encuentra agregada en favoritos");
+        throw new Error("The movie is already added to favorites");
       }
       const newFavorite = await Favoritos.create({ movieId });
       return newFavorite.setUser(userId);
@@ -74,7 +74,7 @@ class UserServices {
         where: { movieId: movieId, userId: userId },
       });
       if (!deletedFavorite) {
-        throw new Error("Pelicula no encontrada en favoritos");
+        throw new Error("Movie not found in favorites");
       }
 
       Favoritos.destroy({ where: { movieId: movieId } });
@@ -98,13 +98,26 @@ class UserServices {
       user.username = data.username;
       user.url_img = data.url_img;
 
-      if (data.password) {await user.actualizar(data.password)}
-
-      
+      if (data.password) {
+        await user.actualizar(data.password);
+      }
 
       const userModified = await user.save();
 
       return userModified;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  static async isFavorite(movieId) {
+    try {
+      const movie = await Favoritos.findOne({ where: { movieId: movieId } });
+      if (!movie) {
+        throw new Error("Movie not found in favorites");
+      }
+
+      return movie;
     } catch (error) {
       console.log(error);
     }

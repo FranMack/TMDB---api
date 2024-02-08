@@ -11,6 +11,7 @@ userRouter.put("/editProfile",UserControllers.editProfile);
 userRouter.post("/addFavorite", validateAuth, UserControllers.addToFavorites);
 userRouter.delete("/deleteFavorite", UserControllers.deleteFavorite);
 userRouter.get("/favorites", validateAuth, UserControllers.getFavorites);
+userRouter.get("/isFavorite/:movieId", UserControllers.isFavorite);
 userRouter.get("/me", validateAuth, (req, res) => {
   res.send(req.user);
 });

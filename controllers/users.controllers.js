@@ -2,6 +2,7 @@ const Users = require("../models/users.model");
 const UserServices = require("../services/user.services");
 const { body, validationResult } = require("express-validator");
 const { generateToken } = require("../config/token");
+const { Favoritos } = require("../models");
 
 class UserControllers {
   static async register(req, res) {
@@ -41,23 +42,22 @@ class UserControllers {
         .withMessage("invalid email")
         .run(req);
 
-        if(req.body.password)
-
-      {await body("password")
-        .notEmpty()
-        .withMessage("password is required")
-        .isLength({ min: 8 })
-        .withMessage("password minimum 8 character")
-        .matches(/^(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/)
-        .withMessage("password must contain at least one special character")
-        .matches(/\d/)
-        .withMessage("password must contain at least one number")
-        .matches(/[a-z]/)
-        .withMessage("password must contain at least one lowercase letter")
-        .matches(/[A-Z]/)
-        .withMessage("password must contain at least one capital letter")
-        .run(req);
-}
+      if (req.body.password) {
+        await body("password")
+          .notEmpty()
+          .withMessage("password is required")
+          .isLength({ min: 8 })
+          .withMessage("password minimum 8 character")
+          .matches(/^(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/)
+          .withMessage("password must contain at least one special character")
+          .matches(/\d/)
+          .withMessage("password must contain at least one number")
+          .matches(/[a-z]/)
+          .withMessage("password must contain at least one lowercase letter")
+          .matches(/[A-Z]/)
+          .withMessage("password must contain at least one capital letter")
+          .run(req);
+      }
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
         console.log("errores", errors);
@@ -66,7 +66,7 @@ class UserControllers {
 
       const existinUser = await Users.findOne({ where: { email: email } });
 
-      if (existinUser) {
+      if (existinUser.isLength) {
         return res.status(400).json({ errors: "User allredy exist" });
       }
 
@@ -162,78 +162,86 @@ class UserControllers {
         userId
       );
 
-      res.status(200).json({deleted:deletedFavorite});
+      res.status(200).json({ deleted: deletedFavorite });
     } catch (error) {
       console.log(error);
       res.status(400).json({ error: error.message });
     }
   }
 
-  static async editProfile(req,res){
-    const data=req.body
-    try{
-
+  static async editProfile(req, res) {
+    const data = req.body;
+    try {
       await body("name")
-      .notEmpty()
-      .withMessage("firstname is required")
-      .isLength({ min: 1 })
-      .withMessage("firstname minimum 1 character")
-      .matches(/^[A-Za-z\s]+$/)
-      .withMessage("firstname can only contain letters and spaces")
-      .run(req);
+        .notEmpty()
+        .withMessage("firstname is required")
+        .isLength({ min: 1 })
+        .withMessage("firstname minimum 1 character")
+        .matches(/^[A-Za-z\s]+$/)
+        .withMessage("firstname can only contain letters and spaces")
+        .run(req);
 
-    await body("lastname")
-      .notEmpty()
-      .withMessage("firstname is required")
-      .isLength({ min: 1 })
-      .withMessage("lastname minimum 1 character")
-      .matches(/^[A-Za-z\s]+$/)
-      .withMessage("lastname can only contain letters and spaces")
-      .run(req);
+      await body("lastname")
+        .notEmpty()
+        .withMessage("firstname is required")
+        .isLength({ min: 1 })
+        .withMessage("lastname minimum 1 character")
+        .matches(/^[A-Za-z\s]+$/)
+        .withMessage("lastname can only contain letters and spaces")
+        .run(req);
 
-    await body("username")
-      .notEmpty()
-      .withMessage("username is required")
-      .isLength({ min: 1 })
-      .withMessage("username minimum 1 character")
-      .run(req);
+      await body("username")
+        .notEmpty()
+        .withMessage("username is required")
+        .isLength({ min: 1 })
+        .withMessage("username minimum 1 character")
+        .run(req);
 
-    await body("email")
-      .notEmpty()
-      .withMessage("email is required")
-      .isEmail()
-      .withMessage("invalid email")
-      .run(req);
+      await body("email")
+        .notEmpty()
+        .withMessage("email is required")
+        .isEmail()
+        .withMessage("invalid email")
+        .run(req);
 
-    if(req.body.password){await body("password")
-      .notEmpty()
-      .withMessage("password is required")
-      .isLength({ min: 8 })
-      .withMessage("password minimum 8 character")
-      .matches(/^(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/)
-      .withMessage("password must contain at least one special character")
-      .matches(/\d/)
-      .withMessage("password must contain at least one number")
-      .matches(/[a-z]/)
-      .withMessage("password must contain at least one lowercase letter")
-      .matches(/[A-Z]/)
-      .withMessage("password must contain at least one capital letter")
-      .run(req);}
+      if (req.body.password) {
+        await body("password")
+          .notEmpty()
+          .withMessage("password is required")
+          .isLength({ min: 8 })
+          .withMessage("password minimum 8 character")
+          .matches(/^(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/)
+          .withMessage("password must contain at least one special character")
+          .matches(/\d/)
+          .withMessage("password must contain at least one number")
+          .matches(/[a-z]/)
+          .withMessage("password must contain at least one lowercase letter")
+          .matches(/[A-Z]/)
+          .withMessage("password must contain at least one capital letter")
+          .run(req);
+      }
 
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      console.log("errores", errors);
-      return res.status(400).json({ errors: errors.array() });
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        console.log("errores", errors);
+        return res.status(400).json({ errors: errors.array() });
+      }
+
+      const userModified = await UserServices.editProfile(data);
+      res.status(200).json({ userModified });
+    } catch (error) {
+      console.log(error);
     }
+  }
 
+  static async isFavorite(req, res) {
+    const { movieId } = req.params;
 
-      const userModified= await UserServices.editProfile(data)
-      res.status(200).json({userModified})
-
-    }
-
-    catch(error){console.log(error)
-
+    try {
+      const movie = await UserServices.isFavorite(movieId);
+      res.status(200).json(movie);
+    } catch (error) {
+      console.log(error);
     }
   }
 }
